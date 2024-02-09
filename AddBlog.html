@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="user-script.js"></script>
+    <title>Add Blog</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.user-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 500px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+#usernameDisplay {
+    color: #4caf50;
+}
+
+.button-container {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+    </style>
+            <script>
+                    const existingBlogs = JSON.parse(localStorage.getItem('blogs')) || [];
+                function getLocationAndFillLocationField() {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const locationField = document.getElementById('blogLocation');
+                    locationField.value = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                }, function (error) {
+                    console.error('Error getting location:', error.message);
+                    alert('Error getting location. Please enter manually.');
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+                alert('Geolocation is not supported by this browser. Please enter manually.');
+            }
+        }
+
+
+    
+        
+            function saveBlog() {
+
+
+            const blogId=document.getElementById('blogId').value;
+            const title = document.getElementById('blogTitle').value;
+            const content = document.getElementById('blogContent').value;
+            const location = document.getElementById('blogLocation').value;
+            const authorName = document.getElementById('AuthorName').value;
+
+            const blogData = {
+                id: blogId,
+                title: title,
+                content: content,
+                location: location,
+                author: authorName,
+            };
+            const existingBlogs = JSON.parse(localStorage.getItem('blogs')) || [];
+
+            if (existingBlogs.some(blog => blog.id === blogId)) {
+                document.getElementById('result').innerHTML = 'Error: Blog ID already exists!';
+                return;
+            }
+
+            const existingIndex = existingBlogs.findIndex(blog => blog.id === blogId);
+            
+
+            if (existingIndex !== -1) {
+                // If the blog already exists, update it
+                existingBlogs[existingIndex] = blogData;
+            } else {
+                // If the blog is new, add it to the array
+                existingBlogs.push(blogData);
+            }
+
+
+            // Save the updated list of blogs to localStorage
+            localStorage.setItem('blogs', JSON.stringify(existingBlogs));
+
+            document.getElementById('result').innerHTML = 'Blog Added successful! Redirecting...';
+
+            setTimeout(function () {
+                window.location.href = 'User.html';
+            }, 2000);
+
+            // Optionally, you can display a confirmation message or perform other actions
+        
+            
+        }
+
+        function setAuthorName() {
+            // Retrieve the logged-in username from local storage
+            const loggedInUsername = localStorage.getItem('loggedInUser');
+
+            // Set the AuthorName input field to the logged-in username
+            document.getElementById('AuthorName').value = loggedInUsername;
+        }
+
+
+    </script>
+</head>
+<body onload="setAuthorName()">
+    <div class="user-container">
+       <h2>Welcome, <span id="usernameDisplay"></span>!</h2>
+       <h2> Add Blog</h2>
+        <div id="addBlogForm" style="display: block;">
+            <center>
+            <form>
+            <table>
+                <tr>
+                    <td><label for="BlogId">Blog ID:</label></td>
+                    <td><input type="text" id="blogId"></td>
+                </tr>
+            <tr>
+                <td><label for="blogTitle">Title:</label></td>
+                <td> <input type="text" id="blogTitle" required></td>
+            </tr>
+            <tr>
+                <td><label for="blogContent">Content:</label> </td>
+                <td> <textarea id="blogContent" rows="10" cols="30" required></textarea> </td>
+            </tr>  
+            <tr>
+                <td><label for="AuthorName">AuthorName:</label></td>
+                <td> <input type="text" id="AuthorName" readonly required></td>
+            </tr>   
+            <tr>
+                <td> <label for="blogLocation">Location:</label></td>
+                <td><input type="text" id="blogLocation" readonly></td>
+                <td><button type="button" onclick="getLocationAndFillLocationField()">Get Location</button></td>
+            </tr>
+            </table>
+            
+                <button type="button" onclick="saveBlog()">Save Blog</button>
+            </form>
+            <div id="result"></div>
+        </center>
+        </div>
+    </div>
+</body>
+</html>
